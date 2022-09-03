@@ -1,0 +1,355 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{comment}
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{siunitx}
+
+
+\begin{document}
+\title{%
+  STATS4846/9864 Final Project\\
+  \large Ball Projection Experiment}
+\author{Kecheng Xiao, Yunjie Xu, Nicholas Gregory DaFonseca Finn\\[9cm]{ Professor: Wenqing He}}
+\date{December 2020}
+\maketitle
+\newpage
+
+
+\tableofcontents
+\newpage
+
+
+\section{Experiment Introduction}
+The main purpose of this experiment is to study the factors that will affect the drop distance of a ball-shaped object from a certain height level. To realize it, we designed a ball projection experiment and the analysis of the result is done by a $2^k$ Factorial Design. Also, while doing this experiment, we found out the processes of making paper-balls vary from person to person, which may result to differences in terms of the roundness or other features. To further reduce the concern of handmade paper-balls, the Nested Model Design is applied.\citep{textbook}
+
+
+\section{PPDA Procedure}
+\subsection{Problem}
+1. What factor will affect the drop distance of a ball-shaped object?\\
+2. Is the maker of paper-balls a significant factor to the drop distance? 
+
+\subsection{Plan}
+\subsubsection{Experiment Unit}
+Two different types of balls are used:\\
+1. Baseball\\
+2. Paper-ball (Balled-up paper, and shape is fixed by some tape)\\
+\\
+\textbf{Note}: The baseball have two levels: a standard size version ($radius=3.4cm$), a smaller size version ($radius=2.4cm$). The smaller version of the baseball is a dog toy, that has similar texture of a regular baseball. The paper-balls are made in the same dimensions. Within each levels, all ball samples are randomly selected from the shop or made by group members. 
+\subsubsection{Procedure}
+\textbf{Experiment 1}\\
+Push balls with a mechanical spring (the upper arm of the hole puncher) from a certain distance to the edge of the table with height, observe the distance from the table edge projected on the floor to the first drop point. Record the measured distance and repeat one more times. For the tables we used, the surface texture is either smooth wood or rough wood.\\
+\\
+\textbf{Experiment 2}\\
+All group members are provided with four paper to make two small size paper-balls, two paper per ball. The first ball's experiment result is considered as the first batch, so we have two batches in total. When the paper-balls are pressed to the standard dimensions, then they can be balled-up by tape. The method of making paper-balls is not restricted. Finally, we use all balls to run the first experiment with all other levels are controlled as low.
+
+\subsubsection{Response}
+Distance from the table edge projected on the floor to the first drop point
+\subsubsection{Factors}
+1. Ball Type (2 levels: Paper-ball, Baseball; leveling by their weight)\\
+2. Force of pushing (2 levels: Spring with half pressed or full pressed)\\
+3. Distance rolled on the table (2 levels: 15cm or 45cm)\\
+4. Table Height (2 levels: 0.5m or 1m)\\ 
+5. Table Surface (2 levels: Smooth or Rough)\\
+6. Maker (3 suppliers; studied by the second experiment)
+
+\subsection{Data}
+\textbf{Experiment 1}\\
+Sample size of the first experiment is determined by the leveling of the factors(exclude the Maker) and the 2 replicate requirement, since we still want to analyze how the interactions of factors affect the final distance, so the sample size calculation is: $2\times2\times2\times2\times2\times2=64$. The detail of the data is in the Data1 file.\\
+\\
+\textbf{Experiment 2}\\
+The experiment of maker's effect on paper-balls includes 18 observations, which is determined by the data structure including three makers, two batches and three test runs, so the sample size calculation is: $3\times2\times3=18$. The detail of the data is in the "Nested Model Design" section.\\
+
+
+\subsection{Analysis}
+1. $2^k$ Factorial Design: Study all the potential two-level factors with one model.\\
+2. Nested Model Design: Study the maker's effect on the paper-ball result.
+
+
+\section{Exploratory Data Analysis}
+\subsection{Exploring Data Using Plots}
+In order to explore how each factor and its levels impact the Data, we will be using Boxplots. Boxplots work well with factored variables as it allows us to see the mean value as well as the range (IQR specifically) that output distances are corresponding to each factor level. This allows us to really visualize the relations between factor levels and the distance output.\\
+\\
+\textbf{Table Factors: Surface, Height, Length(Decelerate Distance)}\\
+\\
+%------------------------------------------------------------------------------------------------------
+%-------------------------------------------------R----------------------------------------------------
+<<echo=FALSE, cache=TRUE>>=
+df = read.csv("4846_Data1.csv", header = TRUE)
+df$Surface = as.factor(df$Surface)
+df$Height = as.factor(df$Height)
+df$TableLength = as.factor(df$TableLength)
+df$Size= as.factor(df$Size)
+df$Type = as.factor(df$Type)
+library(ggplot2)
+library(gtable)
+library(gridExtra)
+library(grid)
+library(ggplot2)
+library(lattice)
+
+p <- ggplot(df, aes(x=Surface, y=Distance, fill=Surface)) + geom_boxplot() + labs(title="Plot of Distance for Surface", x="Surface", y = "Distance")
+p2 <- ggplot(df, aes(x=Height, y=Distance, fill=Height)) + geom_boxplot() + labs(title="Plot of Distance for Height", x="Height", y = "Distance")
+p3 <- ggplot(df, aes(x=TableLength, y=Distance, fill=TableLength)) + geom_boxplot() + labs(title="Plot of Distance for Table Length", x="Table Length", y = "Distance")
+
+pg <- ggplotGrob(p)
+pg2 <- ggplotGrob(p2)
+pg3 <- ggplotGrob(p3)
+
+grid.arrange(pg, pg2, pg3)
+
+@
+%------------------------------------------------END---------------------------------------------------
+%-------------------------------------------------R----------------------------------------------------
+When looking out our first plot of Rough vs Smooth surface tables, we can almost see that it seemingly makes no impact on distance, as the boxplots are almost identical for each factor level. This could be foreshadowing of a factor that could be omitted from future use, or possibly used as a nuisance factor in other models. Next we can see that for the boxplot of High vs Low table height, we can see that higher Height increases distance a significant amount, which would make a lot of sense in regards to how the data was gathered. As it was a drop ball test, and the amount of time it would have to fall would impact it's total distance. Now for our plot of Table Lengths, we can see that there seems to be a much greater variability in the distances from the shorter decelerate distance in comparison to that of the longer decelerate distance. While also the values of the shorter decelerate distance were consistently larger than that of the longer decelerate distance. This could possibly be due to a longer decelerate distance providing less spontaneous results.\\
+\\
+\textbf{Ball Factors: Size, Type}\\
+\\
+%------------------------------------------------------------------------------------------------------
+%-------------------------------------------------R----------------------------------------------------
+<<echo=FALSE, cache=TRUE>>=
+p4 <- ggplot(df, aes(x=Size, y=Distance, fill=Size)) + geom_boxplot() + labs(title="Plot of Distance for Ball size", x="Ball Size", y = "Distance")
+p5 <- ggplot(df, aes(x=Type, y=Distance, fill=Type)) + geom_boxplot() + labs(title="Plot of Distance for Type of Ball", x="Ball Type", y = "Distance")
+
+pg4 <- ggplotGrob(p4)
+pg5 <- ggplotGrob(p5)
+
+grid.arrange(pg4, pg5)
+
+@
+%------------------------------------------------END---------------------------------------------------
+%-------------------------------------------------R----------------------------------------------------
+When comparing the distance travelled for each ball size, we can see that the average of each balls distance travelled is kind of similar. Although there seems to be a decently higher range for the larger balls. This could be due to physics possibly, and that larger balls fall faster with more force. Although the means aren't that far apart, it's just the larger sized balls had a higher upper IQR range. When finally analyzing the box plot of our two types of balls, we can see that there is a difference in distance outcomes between each ball, with paper-ball travelling farther confidently overall. The difference in means is not by quite a lot, and the plots are very similar in shape, just with paper-ball scaled up higher a bit more.
+
+\subsection{Analyzing the Effects in our Data}
+Given that we are utilizing a $2^5$ factorial model, we should end up with a total of 32 factors:\\
+5 Main Factors:\\
+A = Surface Type (Rough, Smooth)\\
+B = Table Height (Low, High)\\
+C = Table Length (Short, Long)\\
+D = Ball Size (Small, Big)\\
+E = Ball Type (Baseball, Paperball)\\
+And with this will also come 27 interaction factors\\
+In order to fully analyze our factors, we must first calculate the estimates of each.
+%------------------------------------------------------------------------------------------------------
+%-------------------------------------------------R----------------------------------------------------
+<<echo=FALSE, cache=TRUE>>=
+#use this code to sum the matrix replicates
+tempS <- matrix(df$Distance, ncol = 2,byrow=TRUE)
+df2_I <- apply(tempS,1,sum)
+
+#Base signs for effects
+df2_e = rep(c(-1,1),16) 
+df2_d = rep(c(-1,-1,1,1),8) 
+df2_c = rep(c(rep(-1,4),rep(1,4)),4) 
+df2_b = rep(c(rep(-1,8),rep(1,8)),2)
+df2_a = c(rep(-1,16),rep(1,16))
+
+#Calculate all 32 effects
+effect_a = (t(df2_I) %*% df2_a)/(32)
+effect_b = (t(df2_I) %*% df2_b)/(32)
+effect_c = (t(df2_I) %*% df2_c)/(32)
+effect_d = (t(df2_I) %*% df2_d)/(32)
+effect_e = (t(df2_I) %*% df2_e)/(32)
+effect_ab = (t(df2_I) %*% (df2_a*df2_b))/(32)
+effect_ac = (t(df2_I) %*% (df2_a*df2_c))/(32)
+effect_ad = (t(df2_I) %*% (df2_a*df2_d))/(32)
+effect_ae = (t(df2_I) %*% (df2_a*df2_e))/(32)
+effect_bc = (t(df2_I) %*% (df2_c*df2_b))/(32)
+effect_bd = (t(df2_I) %*% (df2_d*df2_b))/(32)
+effect_be = (t(df2_I) %*% (df2_e*df2_b))/(32)
+effect_cd = (t(df2_I) %*% (df2_c*df2_d))/(32)
+effect_ce = (t(df2_I) %*% (df2_c*df2_e))/(32)
+effect_de = (t(df2_I) %*% (df2_d*df2_e))/(32)
+effect_abc = (t(df2_I) %*% (df2_a*df2_b*df2_c))/(32)
+effect_abd = (t(df2_I) %*% (df2_a*df2_d*df2_b))/(32)
+effect_abe = (t(df2_I) %*% (df2_a*df2_e*df2_b))/(32)
+effect_acd = (t(df2_I) %*% (df2_a*df2_c*df2_d))/(32)
+effect_ace = (t(df2_I) %*% (df2_a*df2_c*df2_e))/(32)
+effect_ade = (t(df2_I) %*% (df2_a*df2_d*df2_e))/(32)
+effect_bcd = (t(df2_I) %*% (df2_c*df2_b*df2_d))/(32)
+effect_bce = (t(df2_I) %*% (df2_c*df2_b*df2_e))/(32)
+effect_dce = (t(df2_I) %*% (df2_c*df2_d*df2_e))/(32)
+effect_abcd = (t(df2_I) %*% (df2_a*df2_b*df2_c*df2_d))/(32)
+effect_abce = (t(df2_I) %*% (df2_a*df2_b*df2_c*df2_e))/(32)
+effect_abde = (t(df2_I) %*% (df2_a*df2_b*df2_e*df2_d))/(32)
+effect_acde = (t(df2_I) %*% (df2_a*df2_e*df2_c*df2_d))/(32)
+effect_bcde = (t(df2_I) %*% (df2_e*df2_b*df2_c*df2_d))/(32)
+effect_abcde = (t(df2_I) %*% (df2_a*df2_b*df2_c*df2_d*df2_e))/(32)
+
+# make a effect list
+df2_effect = c(effect_a,effect_b,effect_c,effect_d,effect_e,effect_ab,effect_ac,effect_ad,effect_ae,effect_bc,
+      effect_bd,effect_be,effect_cd,effect_ce,effect_de,effect_abc,effect_abd,effect_abe,effect_acd,effect_ace,
+      effect_ade,effect_bcd,effect_bce,effect_dce,effect_abcd,effect_abce,effect_abde,effect_acde,effect_bcde,effect_abcde)
+
+effect_names <- c('A','B','C','D','E','AB','AC','AD','BC','BD','CD','AE','BE','CE','DE','ABC','ABD','ACD','BCD','ABE','ACE','BCE','BDE','CDE','ABCD','ABCE','ABDE','ACDE','BCDE','ABCDE')
+
+names(df2_effect) <- effect_names
+
+df2_effect
+
+@
+%------------------------------------------------END---------------------------------------------------
+%-------------------------------------------------R----------------------------------------------------
+There are multiple interesting things to note about our output estimates. A big one being the very low estimated effect of Surface(A), which when you think about it would make some sense given our observed plot of Surface, where it seemed like changing between the two levels made no impact. In contrast, all other main effects have high estimations. Another to things to note is the highest estimated effects of BE, CD and DE, the two-way interaction effect. 
+
+\subsection{Normal Q-Q Plot of Factors}
+To visualize the significance of effects, the Normal Q-Q plot is used. This allows us to easily compare our estimated factors that we previously calculated and the distances from the normal line almost give them a ranking. The single replicate assumption is applied with only using the first replicate value.
+%------------------------------------------------------------------------------------------------------
+%-------------------------------------------------R----------------------------------------------------
+<<echo=FALSE, cache=TRUE>>=
+#Plot
+tmp2 <- qqnorm(df2_effect)
+qqline(df2_effect)
+text(tmp2$x,tmp2$y,labels=effect_names, pos=2)
+@
+%------------------------------------------------END---------------------------------------------------
+%-------------------------------------------------R----------------------------------------------------
+We can clearly see that all main factors are the most significant except the A. Many two-way interaction factors such as: BD, CD and CE are being close behind. Next up it's interesting to see that high-level interaction factors BDE and BCDE are the next closest. In fact, all factors include the A(Surface) have no significant effect, so we can conclude A has no interaction to other factors. Therefore, we can predict that the main factors other than A and the two-way interaction factors will be dominate factors in the $2^k$ Factorial Design.
+
+\section{$2^k$ Factorial Design}
+\subsection{Model Assumption}
+All five factors are assumed to be fixed, and the treatment effects are defined as the deviations from the overall mean, so $\sum_{i=1}^{a}\tau=0$, $\sum_{i=1}^{b}{\beta=0}$. Similarly, all the interaction effects are fixed and are defined, such that $\sum_{i=1}^{a}{\tau\beta=0}$, and random error component $\varepsilon\sim N(0,\sigma^2)$.
+\subsection{Model Screening: ANOVA}
+\subsubsection{Full Model}
+%------------------------------------------------------------------------------------------------------
+%-------------------------------------------------R----------------------------------------------------
+<<echo=FALSE, cache=TRUE>>=
+#Surface as factor_1
+#Hight as factor_2
+#TableLength as factor_3
+#Size as factor_4
+#Type as factor_5
+
+df = read.csv("4846_Data1.csv", header = TRUE)
+
+x1 <- as.factor(df$Surface)
+x2 <- as.factor(df$Height)
+x3 <- as.factor(df$TableLength)
+x4 <- as.factor(df$Size)
+x5 <- as.factor(df$Type)
+
+#we fit full model by use all factors we can use
+fit_full <- lm(data = df, Distance ~ x1 * x2 * x3 * x4 * x5)
+
+anova(fit_full)
+@
+%------------------------------------------------END---------------------------------------------------
+%-------------------------------------------------R----------------------------------------------------
+At first, we use the full model to fit. From the result of ANOVA table, we find result that the main factor, Surface, is insignificant and many of interaction effects including it are also insignificant, especially for higher level interactions.
+
+\subsubsection{Model with Significant Factors}
+%------------------------------------------------------------------------------------------------------
+%-------------------------------------------------R----------------------------------------------------
+<<echo=FALSE, cache=TRUE>>=
+fit_1 <- lm(data = df, Distance ~ x2 + x3 + x4 + x5 + x2:x3 + x2:x4 + x3:x4 + x2:x5 + x3:x5 + x4:x5 + x2:x3:x4 + x2:x3:x5 + x2:x4:x5 + x2:x3:x4:x5)
+
+anova(fit_1)
+@
+%------------------------------------------------END---------------------------------------------------
+%-------------------------------------------------R----------------------------------------------------
+From the ANOVA table above, we remove all the insignificant factor based on $\alpha = 0.05$. Then, we fit the model with only significant factors. Here is the result. Since all the factors are significant right now, thus, we assume this model can be one of the final models.
+
+\subsubsection{Step-wise Model}
+%------------------------------------------------------------------------------------------------------
+%-------------------------------------------------R----------------------------------------------------
+<<echo=FALSE, include=FALSE, cache=TRUE>>=
+fit_sw <- lm(data = df, Distance ~ x1 * x2 * x3 * x4 * x5)
+tatep <- step(fit_sw)
+@
+<<echo=FALSE, cache=TRUE>>=
+summary(tatep)
+@
+%------------------------------------------------END---------------------------------------------------
+%-------------------------------------------------R----------------------------------------------------
+Before we check the model adequacy, we use the step-wise selection to verify that the model we selected above is the best model. After we find the row model selected by step-wise selection, we still see there are some effects are insignificant. We get rid of those factors. Then we obtain the final model from step-wise selection.
+
+\subsubsection{Final Model}
+%------------------------------------------------------------------------------------------------------
+%-------------------------------------------------R----------------------------------------------------
+<<echo=FALSE, cache=TRUE>>=
+#The final Model selected by stepwise selection
+fit_2 <- lm(formula = Distance ~ x2 + x3 + x4 + x5 + x2:x3 + x2:x4 + x3:x4 + 
+    x2:x5 + x3:x5 + x4:x5 + x2:x3:x4 + x2:x3:x5 + x2:x4:x5 + 
+    x2:x3:x4:x5, data = df)
+
+anova(fit_2)
+@
+%------------------------------------------------END---------------------------------------------------
+%-------------------------------------------------R----------------------------------------------------
+Since the result from the step-wise selection is the same from the first model. We can determine that the first model is the final model.
+
+\subsection{Model Adequacy}
+%------------------------------------------------------------------------------------------------------
+%-------------------------------------------------R----------------------------------------------------
+<<echo=FALSE, cache=TRUE>>=
+#Model checking for model_2
+#Residual Check and Normality check
+par(mfrow = c(2,2))
+plot(fit_2)
+@
+%------------------------------------------------END---------------------------------------------------
+%-------------------------------------------------R----------------------------------------------------
+\subsubsection{Conclusion}
+\textbf{Residual vs. Fitted Plot}
+Residuals “bounce randomly” around the 0 line, which indicates the linearity assumption holds. Residuals roughly form a “horizontal band” around the 0 line, indicating the equal variance assumption holds.\\
+\textbf{Normal Q-Q plot}
+The Q-Q plot gives a linear pattern with no obvious fat tails, thus the error terms should come from a normal distribution.\\
+\textbf{Scale-Location}
+The scale of residuals change to the standardized residual. The assumption holds in first plot, so will also hold in here.\\
+\textbf{Residuals vs. Leverage}
+There are three influential points. But the influence will not be significant by observing the plot.\\
+
+
+\section{Nested Model Design}
+\subsection{Table}
+Since the paper-balls are handmade, to reduce the concern from the effect of different makers, the Nested Model Design is used, data are listed as follows:\\
+\\
+\begin{tabular}{lSSSSSS}
+    \toprule
+    \multirow{3}{*}{Batch} &
+      \multicolumn{2}{c}{Maker 1} &
+      \multicolumn{2}{c}{Maker 2} &
+      \multicolumn{2}{c}{Maker 3} \\
+      \hline
+      & {1} & {2} & {1} & {2} & {1} & {2} \\
+      \midrule
+    run 1 & 21.5 & 22.1 & 19.5 & 21.1 & 20.1 & 22.4 \\
+    run 2 & 20.0 & 21.6 & 20.6 & 20.5 & 21.6 & 21.0 \\
+    run 3 & 20.6 & 23.5 & 20.5 & 21.5 & 21.5 & 21.2 \\
+    \bottomrule
+\end{tabular}
+\subsection{Calculation}
+We will take the supplier and the batch are random factors, due to group members are randomly assigned and balls are made with random methods, so:\\
+\\
+$$SST = \sum^a\sum^b\sum^n y_{ijk}^2-\frac{y_{...}^2}{abn} = \sum(21.5^2+20.0^2+...+21.2^2)-\frac{380.8^2}{3\times2\times3}=8071.42-8056.04=15.38$$
+$$SSA = \frac{1}{bn}\sum^ay_{i..}^2-\frac{y_{...}^2}{abn} = \frac{129.3^2+123.7^2+127.8^2}{6}-\frac{380.8^2}{18}=8058.84-8056.04=2.80$$
+$$SSB_{(A)} = \frac{1}{n}\sum^a\sum^by_{ij.}^2-\frac{1}{bn}\sum^ay_{i..}^2 = \frac{\sum(62.1^2+...+64.6^2)}{3}-\frac{129.3^2+123.7^2+127.8^2}{6}=5.70$$
+$$SSE =\sum^a\sum^b\sum^n y_{ijk}^2-\frac{1}{n}\sum^a\sum^by_{ij.}^2 = 8071.42 - 8064.54 = 6.88$$
+
+\subsection{ANOVA}
+\begin{tabular}{l l l l l l l l}
+  \hline
+  $SS$ & & $DF$ & $MS$ & $All-Random$ & $F^*$ & $F_{0.05,v_1,v_2}$ & $H_0$\\ \hline
+  $SSA$ & 2.80 & 2 & 1.40 & $MSA/MSB_{(A)}$ & 0.737 & 9.55 & Not Reject\\
+  $SSB_{(A)}$ & 5.70 & 3 & 1.90 & $MSB_{(A)}/MSE$ & 3.316 & 3.49 & Not Reject\\
+  $SSE$ & 6.88 & 12 & 0.573   \\ \hline
+  $SST$ & 15.38 & 17  \\
+  \hline  
+\end{tabular}
+
+\subsection{Conclusion}
+From the ANOVA result, we can see there is no different between makers and batches under $\alpha=0.05$, but the batch effect will be significant under $\alpha=0.01$. This indicates that paper-balls performances in different batches are different in a slight level, but the differences caused by the maker effect are very small, and will not be statistically significant.
+
+\section{Discussion}
+From the physics point of view, the experiment of this project is similar to a flat parabolic motion study. The two core factors are the initial velocity and height of falling. According to the physics law, the factors: Surface, Table Length(Decelerate Distance), Ball Size and Ball Type should influence on initial velocity, so the statistics conclusions are correct in the majority. One exception is that the table surface has no significant effect. After group members' discussion, the most likely cause is the rough table texture did not produce enough fractions to decelerate the ball motion. 
+
+\section{Conclusion}
+With the Exploratory Data Analysis, the $2^k$ Factorial Design and the Nested Model Design, we complete the experiment with credible results. Firstly, we come up some initial thought from the two level comparison with the Boxplots. Then, we discover the significant factors that will affect the drop distance of a ball-shaped object from a certain height level, which are the Ball Type, Ball Size, Table Height, and Table Length(Decelerate Distance Length on Table). The Table Surface will not have effect, because the ball motion are not sensitive to the slightly rougher texture. Finally, we excluded the effect of makers by the Nested Model results. 
+
+\bibliographystyle{plain}
+\bibliography{references}
+\end{document}
